@@ -1,48 +1,6 @@
 [
   {
     "name": "Obalduyes",
-    "run1": 480,
-    "run2": 495,
-    "run3": "?",
-    "room": "101"
-  },
-  {
-    "name": "Kundelik",
-    "run1": 440,
-    "run2": 450,
-    "run3": "?",
-    "room": "102"
-  },
-  {
-    "name": "Команда В",
-    "run1": 390,
-    "run2": 400,
-    "run3": "?",
-    "room": "103"
-  },
-  {
-    "name": "Obalduyes",
-    "run1": 500,
-    "run2": 510,
-    "run3": 495,
-    "room": "201"
-  },
-  {
-    "name": "Kundelik",
-    "run1": 455,
-    "run2": 460,
-    "run3": 448,
-    "room": "202"
-  },
-  {
-    "name": "Команда В",
-    "run1": 420,
-    "run2": 430,
-    "run3": 415,
-    "room": "203"
-  },
-  {
-    "name": "Obalduyes",
     "run1": 485,
     "run2": 490,
     "run3": 478,

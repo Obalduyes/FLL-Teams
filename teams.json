@@ -1,0 +1,84 @@
+[
+  {
+    "season": "25/26",
+    "competition": "Qualifier",
+    "name": "Obalduyes",
+    "run1": 480,
+    "run2": 495,
+    "run3": "?",
+    "room": "101"
+  },
+  {
+    "season": "25/26",
+    "competition": "Qualifier",
+    "name": "Kundelik",
+    "run1": 440,
+    "run2": 450,
+    "run3": "?",
+    "room": "102"
+  },
+  {
+    "season": "25/26",
+    "competition": "Qualifier",
+    "name": "Команда В",
+    "run1": 390,
+    "run2": 400,
+    "run3": "?",
+    "room": "103"
+  },
+  {
+    "season": "25/26",
+    "competition": "Regional",
+    "name": "Obalduyes",
+    "run1": 500,
+    "run2": 510,
+    "run3": 495,
+    "room": "201"
+  },
+  {
+    "season": "25/26",
+    "competition": "Regional",
+    "name": "Kundelik",
+    "run1": 455,
+    "run2": 460,
+    "run3": 448,
+    "room": "202"
+  },
+  {
+    "season": "25/26",
+    "competition": "Regional",
+    "name": "Команда В",
+    "run1": 420,
+    "run2": 430,
+    "run3": 415,
+    "room": "203"
+  },
+  {
+    "season": "25/26",
+    "competition": "Final",
+    "name": "Obalduyes",
+    "run1": 485,
+    "run2": 490,
+    "run3": 478,
+    "room": "301"
+  },
+  {
+    "season": "25/26",
+    "competition": "Final",
+    "name": "Kundelik",
+    "run1": 450,
+    "run2": 455,
+    "run3": 442,
+    "room": "302"
+  },
+  {
+    "season": "25/26",
+    "competition": "Final",
+    "name": "Команда В",
+    "run1": 410,
+    "run2": 420,
+    "run3": 405,
+    "room": "303"
+  }
+]
+

@@ -1,7 +1,5 @@
 [
   {
-    "season": "25/26",
-    "competition": "Qualifier",
     "name": "Obalduyes",
     "run1": 480,
     "run2": 495,
@@ -9,8 +7,6 @@
     "room": "101"
   },
   {
-    "season": "25/26",
-    "competition": "Qualifier",
     "name": "Kundelik",
     "run1": 440,
     "run2": 450,
@@ -18,8 +14,6 @@
     "room": "102"
   },
   {
-    "season": "25/26",
-    "competition": "Qualifier",
     "name": "Команда В",
     "run1": 390,
     "run2": 400,
@@ -27,8 +21,6 @@
     "room": "103"
   },
   {
-    "season": "25/26",
-    "competition": "Regional",
     "name": "Obalduyes",
     "run1": 500,
     "run2": 510,
@@ -36,8 +28,6 @@
     "room": "201"
   },
   {
-    "season": "25/26",
-    "competition": "Regional",
     "name": "Kundelik",
     "run1": 455,
     "run2": 460,
@@ -45,8 +35,6 @@
     "room": "202"
   },
   {
-    "season": "25/26",
-    "competition": "Regional",
     "name": "Команда В",
     "run1": 420,
     "run2": 430,
@@ -54,8 +42,6 @@
     "room": "203"
   },
   {
-    "season": "25/26",
-    "competition": "Final",
     "name": "Obalduyes",
     "run1": 485,
     "run2": 490,
@@ -63,8 +49,6 @@
     "room": "301"
   },
   {
-    "season": "25/26",
-    "competition": "Final",
     "name": "Kundelik",
     "run1": 450,
     "run2": 455,
@@ -72,8 +56,6 @@
     "room": "302"
   },
   {
-    "season": "25/26",
-    "competition": "Final",
     "name": "Команда В",
     "run1": 410,
     "run2": 420,
@@ -81,4 +63,3 @@
     "room": "303"
   }
 ]
-

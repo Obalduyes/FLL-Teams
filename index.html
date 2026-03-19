@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FLL Teams Results</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <!-- Header area -->
+      <div class="topbar">
+        <div class="title">
+          <h1>Результаты команд FLL</h1>
+          <p>
+            Сортировка по лучшему результату (1st/2nd/3rd run), поиск по
+            названию и подсветка топ-3.
+          </p>
+        </div>
+        <div class="status" aria-live="polite">
+          <div class="row">
+            <span class="label">Статус</span>
+            <span class="value" id="statusValue">Загрузка...</span>
+          </div>
+          <div class="row" style="margin-top: 8px;">
+            <span class="label">Последнее обновление</span>
+            <span class="value" id="updatedValue">—</span>
+          </div>
+          <div class="row" style="margin-top: 10px;">
+            <button id="tutorialBtn" type="button" class="tutorialBtn">
+              Tutorial
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls (search) -->
+      <div class="controls">
+        <!-- Competition selector -->
+        <div class="field">
+          <label for="competitionSelect">Тип соревнования</label>
+          <select id="competitionSelect" class="input" aria-label="Выбор соревнования">
+            <option value="__all__">Все соревнования</option>
+          </select>
+        </div>
+
+        <!-- Search field -->
+        <div class="field">
+          <label for="searchInput">Поиск по названию команды</label>
+          <input
+            id="searchInput"
+            class="input"
+            type="text"
+            placeholder="Например: Obalduyes"
+            autocomplete="off"
+          />
+        </div>
+        <div class="field">
+          <label for="countValue">Найдено</label>
+          <div id="countValue" class="status" style="padding: 12px 12px;">
+            <div class="row">
+              <span class="label">Команд</span>
+              <span class="value" id="countValueInner">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fallback UI -->
+      <div id="fallback" class="fallback">
+        <p class="hint">
+          Не удалось загрузить <code>.json</code> автоматически. Выберите файл
+          вручную.
+        </p>
+        <input id="fileInput" type="file" accept="application/json" />
+        <button id="reloadFromFileBtn" type="button" class="input" style="margin-top: 10px; padding: 10px 12px; cursor: pointer;">
+          Загружать выбранный JSON
+        </button>
+      </div>
+
+      <!-- Results table -->
+      <div class="card">
+        <div class="tableWrap">
+          <table aria-label="Таблица результатов команд FLL">
+            <thead>
+              <tr>
+                <th style="width: 90px;">Место</th>
+                <th style="min-width: 200px;">Название команды</th>
+                <th style="width: 140px;">1st run</th>
+                <th style="width: 140px;">2nd run</th>
+                <th style="width: 140px;">3rd run</th>
+                <th style="min-width: 180px;">Judging room</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Rows are injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="muted" style="font-size: 12px; margin: 14px 2px 0;">
+        Данные берутся из <code>.json</code>. Поиск работает в реальном времени.
+      </p>
+    </div>
+
+    <!-- Tutorial modal -->
+    <div id="tutorialModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="modalInner">
+        <div class="modalHeader">
+          <h2 class="modalTitle" id="tutorialTitle">Tutorial</h2>
+          <button id="tutorialCloseBtn" type="button" class="modalCloseBtn" aria-label="Закрыть">
+            ×
+          </button>
+        </div>
+        <div class="modalBody">
+          <ol class="tutorialList">
+            <li>Откройте файл <code>.json</code> и добавьте результаты.</li>
+            <li>Выберите <b>Тип соревнования</b> в выпадающем списке.</li>
+            <li>Таблица автоматически сортируется по <b>лучшему run</b> и подсвечивает топ-3.</li>
+            <li>Поле поиска фильтрует команды по названию в реальном времени.</li>
+          </ol>
+          <p class="muted" style="margin: 10px 0 0;">
+            Если локальный файл не грузится, используйте fallback: загрузите <code>.json</code> вручную.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const statusValue = document.getElementById("statusValue");
+      const updatedValue = document.getElementById("updatedValue");
+      const competitionSelect = document.getElementById("competitionSelect");
+      const searchInput = document.getElementById("searchInput");
+      const tableBody = document.getElementById("tableBody");
+      const countValueInner = document.getElementById("countValueInner");
+
+      const fallback = document.getElementById("fallback");
+      const fileInput = document.getElementById("fileInput");
+      const reloadFromFileBtn = document.getElementById("reloadFromFileBtn");
+      const tutorialBtn = document.getElementById("tutorialBtn");
+      const tutorialModal = document.getElementById("tutorialModal");
+      const tutorialCloseBtn = document.getElementById("tutorialCloseBtn");
+
+      let teams = [];
+      let lastTeamsTextHash = "";
+      let searchQuery = "";
+      let selectedCompetition = "__all__";
+      const MAX_SCORE = 545;
+
+      function formatRun(value) {
+        return Number.isFinite(Number(value)) ? `${value}/${MAX_SCORE}` : "—";
+      }
+
+      function hashText(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return (h >>> 0).toString(16);
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function normalizeTeams(jsonData) {
+        if (!Array.isArray(jsonData)) return [];
+        const normalized = [];
+
+        for (const item of jsonData) {
+          if (!item || typeof item !== "object") continue;
+          const name = String(item.name ?? "").trim();
+          const room = String(item.room ?? "").trim();
+          const competition = String(item.competition ?? item.event ?? "Qualifier").trim();
+
+          const run1 = Number(
+            item.run1 ?? item["1st run"] ?? item.firstRun ?? item.run_1 ?? item.score1 ?? item.score ?? NaN
+          );
+          const run2 = Number(
+            item.run2 ?? item["2nd run"] ?? item.secondRun ?? item.run_2 ?? NaN
+          );
+          const run3 = Number(
+            item.run3 ?? item["3rd run"] ?? item.thirdRun ?? item.run_3 ?? NaN
+          );
+
+          if (!name || (!Number.isFinite(run1) && !Number.isFinite(run2) && !Number.isFinite(run3))) {
+            continue;
+          }
+
+          const bestScore = Math.max(
+            Number.isFinite(run1) ? run1 : -Infinity,
+            Number.isFinite(run2) ? run2 : -Infinity,
+            Number.isFinite(run3) ? run3 : -Infinity
+          );
+
+          normalized.push({
+            name,
+            room,
+            competition: competition || "Qualifier",
+            run1,
+            run2,
+            run3,
+            bestScore,
+          });
+        }
+
+        return normalized;
+      }
+
+      function updateCompetitionOptions() {
+        const unique = new Set();
+        teams.forEach((t) => { if (t.competition) unique.add(t.competition); });
+        const competitions = Array.from(unique).sort((a,b) => a.localeCompare(b,"ru",{sensitivity:"base"}));
+        const desired = selectedCompetition;
+
+        competitionSelect.innerHTML = "";
+        const allOption = document.createElement("option");
+        allOption.value = "__all__";
+        allOption.textContent = "Все соревнования";
+        competitionSelect.appendChild(allOption);
+
+        competitions.forEach(comp => {
+          const opt = document.createElement("option");
+          opt.value = comp;
+          opt.textContent = comp;
+          competitionSelect.appendChild(opt);
+        });
+
+        const nextSelection = competitions.includes(desired) ? desired : "__all__";
+        competitionSelect.value = nextSelection;
+        selectedCompetition = nextSelection;
+      }
+
+      function getSortedTeams(filteredTeams) {
+        const list = filteredTeams.slice();
+        list.sort((a,b) => {
+          if(b.bestScore!==a.bestScore) return b.bestScore - a.bestScore;
+          return a.name.localeCompare(b.name,"ru");
+        });
+        return list;
+      }
+
+      function renderTable() {
+        const competitionBase =
+          selectedCompetition === "__all__"
+            ? teams
+            : teams.filter(t => t.competition === selectedCompetition);
+
+        const bestByTeam = new Map();
+        for (const t of competitionBase) {
+          const key = t.name;
+          const existing = bestByTeam.get(key);
+          if(!existing || t.bestScore > existing.bestScore || (t.bestScore===existing.bestScore && String(t.room).localeCompare(String(existing.room),"ru")<0)){
+            bestByTeam.set(key,t);
+          }
+        }
+
+        const uniqueTeams = Array.from(bestByTeam.values());
+        const q = searchQuery.trim().toLowerCase();
+        const filtered = !q ? uniqueTeams : uniqueTeams.filter(t => t.name.toLowerCase().includes(q));
+
+        const overallSorted = getSortedTeams(uniqueTeams);
+        const rankByName = new Map();
+        overallSorted.forEach((t,i)=>rankByName.set(t.name,i+1));
+
+        const sorted = getSortedTeams(filtered);
+        countValueInner.textContent = String(sorted.length);
+        tableBody.innerHTML = "";
+
+        if(sorted.length===0){
+          const tr=document.createElement("tr");
+          tr.innerHTML=`<td colspan="6" style="text-align:center; color: rgba(237,237,237,0.65); padding: 18px 14px;">Ничего не найдено для выбранного типа соревнования.</td>`;
+          tableBody.appendChild(tr);
+          return;
+        }
+
+        sorted.forEach(team=>{
+          const place = rankByName.get(team.name);
+          const rowClass = place===1?"top1":place===2?"top2":place===3?"top3":"";
+          const tr=document.createElement("tr");
+          tr.className=rowClass;
+          tr.innerHTML=`
+            <td>${place}</td>
+            <td>${escapeHtml(team.name)}</td>
+            <td>${formatRun(team.run1)}</td>
+            <td>${formatRun(team.run2)}</td>
+            <td>${formatRun(team.run3)}</td>
+            <td>${escapeHtml(team.room)}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+
+        tableBody.classList.remove("fadeIn");
+        void tableBody.offsetWidth;
+        tableBody.classList.add("fadeIn");
+      }
+
+      async function tryLoadTeamsFromFetch(){
+        const cacheBustedUrl="./teams.json?t="+Date.now();
+        const response = await fetch(cacheBustedUrl,{cache:"no-store"});
+        if(!response.ok) throw new Error("HTTP "+response.status);
+        const text = await response.text();
+        const nextHash = hashText(text);
+        if(nextHash===lastTeamsTextHash) return;
+        const parsed = JSON.parse(text);
+        teams=normalizeTeams(parsed);
+        updateCompetitionOptions();
+        lastTeamsTextHash=nextHash;
+        statusValue.textContent="Обновлено";
+        updatedValue.textContent=new Date().toLocaleString();
+        renderTable();
+      }
+
+      function startPolling(){
+        (async ()=>{
+          try{
+            await tryLoadTeamsFromFetch();
+            statusValue.textContent="Готово";
+          }catch{
+            statusValue.textContent="Не могу загрузить json";
+            fallback.classList.add("visible");
+          }
+        })();
+        setInterval(async()=>{
+          try{await tryLoadTeamsFromFetch(); fallback.classList.remove("visible");}catch{}
+        },5000);
+      }
+
+      async function loadTeamsFromFile(file){
+        const text=await file.text();
+        const parsed=JSON.parse(text);
+        teams=normalizeTeams(parsed);
+        updateCompetitionOptions();
+        lastTeamsTextHash=hashText(text);
+        statusValue.textContent="Загружено вручную";
+        updatedValue.textContent=new Date().toLocaleString();
+        renderTable();
+      }
+
+      reloadFromFileBtn.addEventListener("click",async()=>{
+        const file=fileInput.files && fileInput.files[0];
+        if(!file){statusValue.textContent="Выберите файл json";return;}
+        try{await loadTeamsFromFile(file);}catch{statusValue.textContent="Ошибка JSON формата";}
+      });
+
+      competitionSelect.addEventListener("change",()=>{
+        selectedCompetition=competitionSelect.value;
+        renderTable();
+      });
+
+      searchInput.addEventListener("input",(e)=>{
+        searchQuery=e.target.value||"";
+        renderTable();
+      });
+
+      renderTable();
+      startPolling();
+
+      function openTutorial(){tutorialModal.classList.add("visible");tutorialModal.setAttribute("aria-hidden","false");}
+      function closeTutorial(){tutorialModal.classList.remove("visible");tutorialModal.setAttribute("aria-hidden","true");}
+      tutorialBtn.addEventListener("click",()=>openTutorial());
+      tutorialCloseBtn.addEventListener("click",()=>closeTutorial());
+      tutorialModal.addEventListener("click",(e)=>{if(e.target===tutorialModal)closeTutorial();});
+      document.addEventListener("keydown",(e)=>{if(e.key==="Escape")closeTutorial();});
+    </script>
+  </body>
+</html>

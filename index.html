@@ -1,0 +1,669 @@
+<!doctype html>
+<!--
+  Team Race Results (FLL Portfolio)
+  - Single-page app (no React / no server)
+  - Loads team data from a local JSON file: ./teams.json
+  - Sorts by score (desc), assigns "place" based on sorted order
+  - Highlights top-3 places
+  - Real-time search by team name
+
+  IMPORTANT NOTE ABOUT "DYNAMIC LOADING":
+  Browsers often restrict reading local JSON files via fetch() when opened via file://.
+  This page tries to load teams.json automatically using fetch().
+  If it fails (CORS / file scheme), it shows a fallback file picker:
+  you can select teams.json manually, and it will render instantly.
+
+  To get fully automatic updates when you edit teams.json,
+  open the folder through any local static hosting (e.g., a "live server" extension).
+  This still uses no backend logic; it only allows the browser to fetch the JSON reliably.
+-->
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FLL Teams Results</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <!-- Header area -->
+      <div class="topbar">
+        <div class="title">
+          <h1>Результаты команд FLL</h1>
+          <p>
+            Сортировка по лучшему результату (1st/2nd/3rd run), поиск по
+            названию и подсветка топ-3. Выберите сезон и тип соревнования.
+          </p>
+        </div>
+        <div class="status" aria-live="polite">
+          <div class="row">
+            <span class="label">Статус</span>
+            <span class="value" id="statusValue">Загрузка...</span>
+          </div>
+          <div class="row" style="margin-top: 8px;">
+            <span class="label">Сезон</span>
+            <span class="value" id="seasonTextValue">—</span>
+          </div>
+          <div class="row" style="margin-top: 8px;">
+            <span class="label">Последнее обновление</span>
+            <span class="value" id="updatedValue">—</span>
+          </div>
+          <div class="row" style="margin-top: 10px;">
+            <button id="tutorialBtn" type="button" class="tutorialBtn">
+              Tutorial
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls (search) -->
+      <div class="controls">
+        <!-- Season selector -->
+        <div class="field">
+          <label for="seasonSelect">Сезон</label>
+          <select id="seasonSelect" class="input" aria-label="Выбор сезона">
+            <option value="__all__">Все сезоны</option>
+          </select>
+        </div>
+
+        <!-- Competition selector -->
+        <div class="field">
+          <label for="competitionSelect">Тип соревнования</label>
+          <select id="competitionSelect" class="input" aria-label="Выбор соревнования">
+            <option value="__all__">Все соревнования</option>
+          </select>
+        </div>
+
+        <!-- Search field (filters by team name in real time) -->
+        <div class="field">
+          <label for="searchInput">Поиск по названию команды</label>
+          <input
+            id="searchInput"
+            class="input"
+            type="text"
+            placeholder="Например: Obalduyes"
+            autocomplete="off"
+          />
+        </div>
+        <div class="field">
+          <label for="countValue">Найдено</label>
+          <div id="countValue" class="status" style="padding: 12px 12px;">
+            <div class="row">
+              <span class="label">Команд</span>
+              <span class="value" id="countValueInner">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fallback UI (shown if automatic fetch() fails) -->
+      <div id="fallback" class="fallback">
+        <p class="hint">
+          Не удалось загрузить <code>.json</code> автоматически (часто
+          из-за ограничений браузера на локальные файлы). Выберите файл
+          вручную, и страница отобразит результаты.
+        </p>
+        <input id="fileInput" type="file" accept="application/json" />
+        <button id="reloadFromFileBtn" type="button" class="input" style="margin-top: 10px; padding: 10px 12px; cursor: pointer;">
+          Загружать выбранный JSON
+        </button>
+      </div>
+
+      <!-- Results table -->
+      <div class="card">
+        <div class="tableWrap">
+          <table aria-label="Таблица результатов команд FLL">
+            <thead>
+              <tr>
+                <th style="width: 90px;">Место</th>
+                <th style="min-width: 200px;">Название команды</th>
+                <th style="width: 140px;">1st run</th>
+                <th style="width: 140px;">2nd run</th>
+                <th style="width: 140px;">3rd run</th>
+                <th style="min-width: 180px;">Judging room</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Rows are injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Small footer note -->
+      <p class="muted" style="font-size: 12px; margin: 14px 2px 0;">
+        Данные берутся из <code>.json</code>. Поиск работает в реальном времени.
+      </p>
+    </div>
+
+    <!-- Tutorial modal -->
+    <div id="tutorialModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="modalInner">
+        <div class="modalHeader">
+          <h2 class="modalTitle" id="tutorialTitle">Tutorial</h2>
+          <button id="tutorialCloseBtn" type="button" class="modalCloseBtn" aria-label="Закрыть">
+            ×
+          </button>
+        </div>
+        <div class="modalBody">
+          <ol class="tutorialList">
+            <li>Откройте файл <code>.json</code> и добавьте результаты.</li>
+            <li>Выберите <b>Сезон</b> и <b>Тип соревнования</b> в выпадающих списках.</li>
+            <li>Таблица автоматически сортируется по <b>лучшему run</b> и подсвечивает топ-3.</li>
+            <li>Поле поиска фильтрует команды по названию в реальном времени.</li>
+          </ol>
+          <p class="muted" style="margin: 10px 0 0;">
+            Если у вас локальный файл не грузится из браузера, используйте fallback: загрузите <code>.json</code> вручную.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /***********************************************************************
+       * DOM helpers
+       **********************************************************************/
+      const statusValue = document.getElementById("statusValue");
+      const updatedValue = document.getElementById("updatedValue");
+      const seasonTextValue = document.getElementById("seasonTextValue");
+      const seasonSelect = document.getElementById("seasonSelect");
+      const competitionSelect = document.getElementById("competitionSelect");
+      const searchInput = document.getElementById("searchInput");
+      const tableBody = document.getElementById("tableBody");
+      const countValueInner = document.getElementById("countValueInner");
+
+      const fallback = document.getElementById("fallback");
+      const fileInput = document.getElementById("fileInput");
+      const reloadFromFileBtn = document.getElementById("reloadFromFileBtn");
+      const tutorialBtn = document.getElementById("tutorialBtn");
+      const tutorialModal = document.getElementById("tutorialModal");
+      const tutorialCloseBtn = document.getElementById("tutorialCloseBtn");
+
+      /***********************************************************************
+       * State
+       **********************************************************************/
+      // All teams loaded from JSON
+      let teams = [];
+      // Hash of last loaded JSON text to detect changes without a full reload
+      let lastTeamsTextHash = "";
+      // Current search query
+      let searchQuery = "";
+      // Current season selection (see option values in HTML)
+      let selectedSeason = "__all__";
+      // Current competition selection (see option values in HTML)
+      let selectedCompetition = "__all__";
+
+      // Max possible points on a card (used for display: score/max_score).
+      const MAX_SCORE = 545;
+
+      // Format run score for table cells: "score/max_score".
+      // If a run value is missing/not a number, render as "—".
+      function formatRun(value) {
+        return Number.isFinite(Number(value)) ? `${value}/${MAX_SCORE}` : "—";
+      }
+
+      /***********************************************************************
+       * Utilities
+       **********************************************************************/
+      // Tiny hash function to detect changes in fetched text.
+      // (Not cryptographic; just a quick "has it changed" signal.)
+      function hashText(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        // Ensure positive and keep short
+        return (h >>> 0).toString(16);
+      }
+
+      // Escape HTML special chars to avoid breaking table layout.
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      // Formats "last updated" timestamp for UI.
+      function formatUpdatedAt(date) {
+        try {
+          return new Intl.DateTimeFormat(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(date);
+        } catch {
+          return date.toLocaleString();
+        }
+      }
+
+      // Basic validation/normalization of JSON structure.
+      function normalizeTeams(jsonData) {
+        if (!Array.isArray(jsonData)) return [];
+        const normalized = [];
+
+        for (const item of jsonData) {
+          // Accept only objects with expected keys
+          if (!item || typeof item !== "object") continue;
+          const name = String(item.name ?? "").trim();
+          const room = String(item.room ?? "").trim();
+          // Multi-event filtering: Qualifier / Regional / Final / etc.
+          const competition = String(item.competition ?? item.event ?? "Qualifier").trim();
+
+          // Season category: "25/26", "26/27", etc.
+          // If missing, default to "25/26" so older JSON still renders.
+          const season = String(item.season ?? item.seasonCategory ?? "25/26").trim();
+
+          // Runs (new data format). For backward compatibility, fall back to legacy `score` as 1st run.
+          const run1 = Number(
+            item.run1 ?? item["1st run"] ?? item.firstRun ?? item.run_1 ?? item.score1 ?? item.score ?? NaN
+          );
+          const run2 = Number(
+            item.run2 ?? item["2nd run"] ?? item.secondRun ?? item.run_2 ?? NaN
+          );
+          const run3 = Number(
+            item.run3 ?? item["3rd run"] ?? item.thirdRun ?? item.run_3 ?? NaN
+          );
+
+          // At least one run must be a finite number.
+          if (!name || (!Number.isFinite(run1) && !Number.isFinite(run2) && !Number.isFinite(run3))) {
+            continue;
+          }
+
+          const bestScore = Math.max(
+            Number.isFinite(run1) ? run1 : -Infinity,
+            Number.isFinite(run2) ? run2 : -Infinity,
+            Number.isFinite(run3) ? run3 : -Infinity
+          );
+
+          normalized.push({
+            name,
+            room,
+            competition: competition || "Qualifier",
+            season: season || "25/26",
+            run1,
+            run2,
+            run3,
+            bestScore,
+          });
+        }
+
+        return normalized;
+      }
+
+      /***********************************************************************
+       * Season selector
+       **********************************************************************/
+      function getSeasonEndDate(seasonStr) {
+        // Expected format: "25/26"
+        const m = String(seasonStr ?? "").match(/^(\d{2})\/(\d{2})$/);
+        if (!m) return null;
+        const endYY = Number(m[2]);
+        const endYear = 2000 + endYY;
+        // End of season: Aug 31 (local time). Adjust if you want.
+        return new Date(endYear, 7, 31, 23, 59, 59);
+      }
+
+      function updateSeasonLabel() {
+        if (!seasonTextValue) return;
+        if (selectedSeason === "__all__") {
+          seasonTextValue.textContent = "Все сезоны";
+          return;
+        }
+
+        const endDate = getSeasonEndDate(selectedSeason);
+        const isPassed = endDate ? Date.now() > endDate.getTime() : false;
+        const suffix = endDate ? (isPassed ? " (прошел)" : " (активен)") : "";
+        seasonTextValue.textContent = `Сезон ${selectedSeason}${suffix}`;
+      }
+
+      function updateSeasonOptions() {
+        const unique = new Set();
+        teams.forEach((t) => {
+          if (t.season) unique.add(t.season);
+        });
+
+        const seasons = Array.from(unique).sort((a, b) =>
+          a.localeCompare(b, "ru", { sensitivity: "base" })
+        );
+
+        const desired = selectedSeason;
+
+        seasonSelect.innerHTML = "";
+
+        const allOption = document.createElement("option");
+        allOption.value = "__all__";
+        allOption.textContent = "Все сезоны";
+        seasonSelect.appendChild(allOption);
+
+        seasons.forEach((s) => {
+          const opt = document.createElement("option");
+          opt.value = s;
+          opt.textContent = s;
+          seasonSelect.appendChild(opt);
+        });
+
+        const has25_26 = seasons.includes("25/26");
+        let nextSelection = desired;
+        if (has25_26) {
+          nextSelection = "25/26";
+        } else if (!seasons.includes(nextSelection)) {
+          nextSelection = seasons.length === 1 ? seasons[0] : "__all__";
+        }
+
+        seasonSelect.value = nextSelection;
+        selectedSeason = nextSelection;
+        updateSeasonLabel();
+      }
+
+      /***********************************************************************
+       * Competition selector
+       **********************************************************************/
+      function updateCompetitionOptions() {
+        // Build a unique set of competitions from loaded data,
+        // filtered by the currently selected season.
+        const unique = new Set();
+        const seasonBase =
+          selectedSeason === "__all__" ? teams : teams.filter((t) => t.season === selectedSeason);
+
+        seasonBase.forEach((t) => {
+          if (t.competition) unique.add(t.competition);
+        });
+
+        const competitions = Array.from(unique).sort((a, b) =>
+          a.localeCompare(b, "ru", { sensitivity: "base" })
+        );
+
+        // Remember current selection to keep UX stable.
+        const desired = selectedCompetition;
+
+        // Reset <select> options.
+        competitionSelect.innerHTML = "";
+
+        const allOption = document.createElement("option");
+        allOption.value = "__all__";
+        allOption.textContent = "Все соревнования";
+        competitionSelect.appendChild(allOption);
+
+        competitions.forEach((comp) => {
+          const opt = document.createElement("option");
+          opt.value = comp;
+          opt.textContent = comp;
+          competitionSelect.appendChild(opt);
+        });
+
+        // If the previously selected competition no longer exists,
+        // fall back to "All competitions".
+        const nextSelection = competitions.includes(desired)
+          ? desired
+          : "__all__";
+
+        competitionSelect.value = nextSelection;
+        selectedCompetition = nextSelection;
+      }
+
+      /***********************************************************************
+       * Sorting and rendering
+       **********************************************************************/
+      // Sort teams by best run score descending, then name ascending (stable-ish tie-breaker).
+      function getSortedTeams(filteredTeams) {
+        const list = filteredTeams.slice();
+        list.sort((a, b) => {
+          if (b.bestScore !== a.bestScore) return b.bestScore - a.bestScore; // higher first
+          return a.name.localeCompare(b.name, "ru"); // consistent ties
+        });
+        return list;
+      }
+
+      // Render table rows based on current state + search query.
+      function renderTable() {
+        // Base set: filter by currently selected season and competition.
+        const seasonBase =
+          selectedSeason === "__all__"
+            ? teams
+            : teams.filter((t) => t.season === selectedSeason);
+
+        const competitionBase =
+          selectedCompetition === "__all__"
+            ? seasonBase
+            : seasonBase.filter((t) => t.competition === selectedCompetition);
+
+        // Deduplicate by team name inside the selected season + competition.
+        // Why: if there are multiple records per team (duplicates or multiple runs),
+        // using the raw array for ranking creates "skipped" places like 3,6,9.
+        // We keep the best run score per team (bestScore: higher is better).
+        const bestByTeam = new Map();
+        for (const t of competitionBase) {
+          const key = t.name;
+          const existing = bestByTeam.get(key);
+          if (!existing) {
+            bestByTeam.set(key, t);
+            continue;
+          }
+          if (t.bestScore > existing.bestScore) {
+            bestByTeam.set(key, t);
+            continue;
+          }
+          if (t.bestScore === existing.bestScore) {
+            // Stable tie-breaker: earlier room wins.
+            if (String(t.room).localeCompare(String(existing.room), "ru") < 0) {
+              bestByTeam.set(key, t);
+            }
+          }
+        }
+
+        const uniqueTeams = Array.from(bestByTeam.values());
+
+        // Filter by search query (case-insensitive, includes),
+        // applied on top of the selected competition AND its best-per-team set.
+        const q = searchQuery.trim().toLowerCase();
+        const filtered = !q
+          ? uniqueTeams
+          : uniqueTeams.filter((t) => t.name.toLowerCase().includes(q));
+
+        // Compute overall ranking for the selected competition based on best-per-team set.
+        const overallSorted = getSortedTeams(uniqueTeams);
+        const rankByName = new Map();
+        overallSorted.forEach((t, i) => rankByName.set(t.name, i + 1));
+
+        // Visible rows: search-filtered, but ranks come from overallSorted.
+        const sorted = getSortedTeams(filtered);
+
+        // Update "found teams" counter
+        countValueInner.textContent = String(sorted.length);
+
+        // Clear table body
+        tableBody.innerHTML = "";
+
+        if (sorted.length === 0) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td colspan="6" style="text-align:center; color: rgba(237,237,237,0.65); padding: 18px 14px;">
+              Ничего не найдено для выбранного сезона и типа соревнования.
+            </td>
+          `;
+          tableBody.appendChild(tr);
+          return;
+        }
+
+        // Create rows
+        sorted.forEach((team, idx) => {
+          const place = rankByName.get(team.name) ?? (idx + 1);
+
+          // Determine class for top-3 based on overall rank.
+          const rowClass =
+            place === 1
+              ? "top1"
+              : place === 2
+                ? "top2"
+                : place === 3
+                  ? "top3"
+                  : "";
+
+          const tr = document.createElement("tr");
+          tr.className = rowClass;
+
+          tr.innerHTML = `
+            <td>${place}</td>
+            <td>${escapeHtml(team.name)}</td>
+            <td>${formatRun(team.run1)}</td>
+            <td>${formatRun(team.run2)}</td>
+            <td>${formatRun(team.run3)}</td>
+            <td>${escapeHtml(team.room)}</td>
+          `;
+
+          tableBody.appendChild(tr);
+        });
+
+        // Add a tiny animation to signal updates
+        tableBody.classList.remove("fadeIn");
+        void tableBody.offsetWidth; // Force reflow so animation can restart
+        tableBody.classList.add("fadeIn");
+      }
+
+      /***********************************************************************
+       * Data loading (teams.json)
+       **********************************************************************/
+      async function tryLoadTeamsFromFetch() {
+        // Use a cache-busting query param so that the UI can refresh
+        // when teams.json changes.
+        // Note: This requires that browser allows fetching this JSON file.
+        const cacheBustedUrl = "./teams.json?t=" + Date.now();
+        const response = await fetch(cacheBustedUrl, { cache: "no-store" });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+
+        // Read text first so we can hash for change detection
+        const text = await response.text();
+        const nextHash = hashText(text);
+
+        // If unchanged, do nothing
+        if (nextHash === lastTeamsTextHash) return;
+
+        // Parse JSON
+        const parsed = JSON.parse(text);
+        teams = normalizeTeams(parsed);
+        updateCompetitionOptions();
+
+        lastTeamsTextHash = nextHash;
+        statusValue.textContent = "Обновлено";
+        updatedValue.textContent = formatUpdatedAt(new Date());
+
+        // Render after data change (no page reload)
+        renderTable();
+      }
+
+      // Start polling for JSON changes (dynamic without page reload).
+      function startPolling() {
+        // Poll interval: small enough for "instant" feeling, but not too heavy.
+        const intervalMs = 5000;
+
+        // Poll immediately on load
+        (async () => {
+          try {
+            await tryLoadTeamsFromFetch();
+            statusValue.textContent = "Готово";
+          } catch (err) {
+            // If fetch fails, show fallback UI
+            statusValue.textContent = "Не могу загрузить json";
+            fallback.classList.add("visible");
+          }
+        })();
+
+        // Continue polling
+        setInterval(async () => {
+          // If we already switched to fallback mode, keep interval but ignore errors.
+          try {
+            await tryLoadTeamsFromFetch();
+            fallback.classList.remove("visible");
+          } catch {
+            // Ignore polling errors to avoid spamming console / UI
+          }
+        }, intervalMs);
+      }
+
+      /***********************************************************************
+       * Fallback: load teams from a user-selected local file
+       **********************************************************************/
+      async function loadTeamsFromFile(file) {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        teams = normalizeTeams(parsed);
+        updateCompetitionOptions();
+        lastTeamsTextHash = hashText(text);
+        statusValue.textContent = "Загружено вручную";
+        updatedValue.textContent = formatUpdatedAt(new Date());
+        renderTable();
+      }
+
+      reloadFromFileBtn.addEventListener("click", async () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) {
+          statusValue.textContent = "Выберите файл json";
+          return;
+        }
+        try {
+          await loadTeamsFromFile(file);
+        } catch (e) {
+          statusValue.textContent = "Ошибка JSON формата";
+        }
+      });
+
+      /***********************************************************************
+       * Search behavior
+       **********************************************************************/
+      seasonSelect.addEventListener("change", () => {
+        selectedSeason = seasonSelect.value;
+        updateSeasonLabel();
+        updateCompetitionOptions();
+        renderTable();
+      });
+
+      competitionSelect.addEventListener("change", () => {
+        selectedCompetition = competitionSelect.value;
+        renderTable();
+      });
+
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value || "";
+        renderTable();
+      });
+
+      /***********************************************************************
+       * App boot
+       **********************************************************************/
+      // Start with an empty state so the table doesn't look broken.
+      renderTable();
+
+      // Then attempt to load teams.json and keep it updated.
+      startPolling();
+
+      /***********************************************************************
+       * Tutorial modal behavior
+       **********************************************************************/
+      function openTutorial() {
+        tutorialModal.classList.add("visible");
+        tutorialModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeTutorial() {
+        tutorialModal.classList.remove("visible");
+        tutorialModal.setAttribute("aria-hidden", "true");
+      }
+
+      tutorialBtn.addEventListener("click", () => openTutorial());
+      tutorialCloseBtn.addEventListener("click", () => closeTutorial());
+      tutorialModal.addEventListener("click", (e) => {
+        if (e.target === tutorialModal) closeTutorial();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeTutorial();
+      });
+    </script>
+  </body>
+</html>
+

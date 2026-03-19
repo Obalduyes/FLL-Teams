@@ -1,133 +1,257 @@
-<script>
-const statusValue = document.getElementById("statusValue");
-const updatedValue = document.getElementById("updatedValue");
-const searchInput = document.getElementById("searchInput");
-const tableBody = document.getElementById("tableBody");
-const countValueInner = document.getElementById("countValueInner");
-const fallback = document.getElementById("fallback");
-const fileInput = document.getElementById("fileInput");
-const reloadFromFileBtn = document.getElementById("reloadFromFileBtn");
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FLL Teams Results</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <!-- Header area -->
+      <div class="topbar">
+        <div class="title">
+          <h1>Результаты команд FLL</h1>
+          <p>
+            Сортировка по лучшему результату (1st/2nd/3rd run) и поиск по названию команды в реальном времени.
+          </p>
+        </div>
+        <div class="status" aria-live="polite">
+          <div class="row">
+            <span class="label">Статус</span>
+            <span class="value" id="statusValue">Загрузка...</span>
+          </div>
+          <div class="row" style="margin-top: 8px;">
+            <span class="label">Последнее обновление</span>
+            <span class="value" id="updatedValue">—</span>
+          </div>
+        </div>
+      </div>
 
-let teams = [];
-let lastTeamsTextHash = "";
-let searchQuery = "";
-const MAX_SCORE = 545;
+      <!-- Controls (search) -->
+      <div class="controls">
+        <div class="field">
+          <label for="searchInput">Поиск по названию команды</label>
+          <input
+            id="searchInput"
+            class="input"
+            type="text"
+            placeholder="Например: Obalduyes"
+            autocomplete="off"
+          />
+        </div>
+        <div class="field">
+          <label for="countValue">Найдено</label>
+          <div id="countValue" class="status" style="padding: 12px 12px;">
+            <div class="row">
+              <span class="label">Команд</span>
+              <span class="value" id="countValueInner">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-function formatRun(value) {
-  return Number.isFinite(Number(value)) ? `${value}/${MAX_SCORE}` : "—";
-}
+      <!-- Fallback UI -->
+      <div id="fallback" class="fallback">
+        <p class="hint">
+          Не удалось загрузить <code>.json</code> автоматически. Выберите файл вручную.
+        </p>
+        <input id="fileInput" type="file" accept="application/json" />
+        <button id="reloadFromFileBtn" type="button" class="input" style="margin-top: 10px; padding: 10px 12px; cursor: pointer;">
+          Загружать выбранный JSON
+        </button>
+      </div>
 
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+      <!-- Results table -->
+      <div class="card">
+        <div class="tableWrap">
+          <table aria-label="Таблица результатов команд FLL">
+            <thead>
+              <tr>
+                <th style="width: 90px;">Место</th>
+                <th style="min-width: 200px;">Название команды</th>
+                <th style="width: 140px;">1st run</th>
+                <th style="width: 140px;">2nd run</th>
+                <th style="width: 140px;">3rd run</th>
+                <th style="min-width: 180px;">Judging room</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Rows are injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-function normalizeTeams(jsonData) {
-  if (!Array.isArray(jsonData)) return [];
-  const normalized = [];
-  for (const item of jsonData) {
-    if (!item || typeof item !== "object") continue;
-    const name = String(item.name ?? "").trim();
-    const room = String(item.room ?? "").trim();
-    const run1 = Number(item.run1 ?? NaN);
-    const run2 = Number(item.run2 ?? NaN);
-    const run3 = Number(item.run3 ?? NaN);
-    if (!name || (!Number.isFinite(run1) && !Number.isFinite(run2) && !Number.isFinite(run3))) continue;
-    normalized.push({ name, room, run1, run2, run3 });
-  }
-  return normalized;
-}
+      <p class="muted" style="font-size: 12px; margin: 14px 2px 0;">
+        Данные берутся из <code>.json</code>. Поиск работает в реальном времени.
+      </p>
+    </div>
 
-function renderTable() {
-  // Фильтрация по поиску
-  const q = searchQuery.trim().toLowerCase();
-  const filtered = !q ? teams : teams.filter(t => t.name.toLowerCase().includes(q));
+    <script>
+      const statusValue = document.getElementById("statusValue");
+      const updatedValue = document.getElementById("updatedValue");
+      const searchInput = document.getElementById("searchInput");
+      const tableBody = document.getElementById("tableBody");
+      const countValueInner = document.getElementById("countValueInner");
 
-  // Обновляем счётчик найденных команд
-  countValueInner.textContent = String(filtered.length);
+      const fallback = document.getElementById("fallback");
+      const fileInput = document.getElementById("fileInput");
+      const reloadFromFileBtn = document.getElementById("reloadFromFileBtn");
 
-  // Очищаем таблицу
-  tableBody.innerHTML = "";
+      let teams = [];
+      let lastTeamsTextHash = "";
+      let searchQuery = "";
+      const MAX_SCORE = 545;
 
-  if (filtered.length === 0) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="6" style="text-align:center; color: rgba(237,237,237,0.65); padding: 18px 14px;">Ничего не найдено.</td>`;
-    tableBody.appendChild(tr);
-    return;
-  }
+      function formatRun(value) {
+        return Number.isFinite(Number(value)) ? `${value}/${MAX_SCORE}` : "—";
+      }
 
-  // Отображаем все команды
-  filtered.forEach(team => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>—</td>
-      <td>${escapeHtml(team.name)}</td>
-      <td>${formatRun(team.run1)}</td>
-      <td>${formatRun(team.run2)}</td>
-      <td>${formatRun(team.run3)}</td>
-      <td>${escapeHtml(team.room)}</td>
-    `;
-    tableBody.appendChild(tr);
-  });
-}
+      function hashText(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return (h >>> 0).toString(16);
+      }
 
-// Загрузка JSON
-async function tryLoadTeamsFromFetch() {
-  const cacheBustedUrl = "./teams.json?t=" + Date.now();
-  const response = await fetch(cacheBustedUrl, { cache: "no-store" });
-  if (!response.ok) throw new Error("HTTP " + response.status);
-  const text = await response.text();
-  const nextHash = hashText(text);
-  if (nextHash === lastTeamsTextHash) return;
-  const parsed = JSON.parse(text);
-  teams = normalizeTeams(parsed);
-  lastTeamsTextHash = nextHash;
-  statusValue.textContent = "Обновлено";
-  updatedValue.textContent = new Date().toLocaleString();
-  renderTable();
-}
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
 
-function hashText(str) {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0).toString(16);
-}
+      function normalizeTeams(jsonData) {
+        if (!Array.isArray(jsonData)) return [];
+        const normalized = [];
 
-function startPolling() {
-  (async () => {
-    try { await tryLoadTeamsFromFetch(); statusValue.textContent = "Готово"; }
-    catch { statusValue.textContent = "Не могу загрузить json"; fallback.classList.add("visible"); }
-  })();
-  setInterval(async () => {
-    try { await tryLoadTeamsFromFetch(); fallback.classList.remove("visible"); } catch {}
-  }, 5000);
-}
+        for (const item of jsonData) {
+          if (!item || typeof item !== "object") continue;
+          const name = String(item.name ?? "").trim();
+          const room = String(item.room ?? "").trim();
 
-async function loadTeamsFromFile(file) {
-  const text = await file.text();
-  const parsed = JSON.parse(text);
-  teams = normalizeTeams(parsed);
-  lastTeamsTextHash = hashText(text);
-  statusValue.textContent = "Загружено вручную";
-  updatedValue.textContent = new Date().toLocaleString();
-  renderTable();
-}
+          const run1 = Number(item.run1 ?? item["1st run"] ?? item.firstRun ?? item.run_1 ?? item.score1 ?? item.score ?? NaN);
+          const run2 = Number(item.run2 ?? item["2nd run"] ?? item.secondRun ?? item.run_2 ?? NaN);
+          const run3 = Number(item.run3 ?? item["3rd run"] ?? item.thirdRun ?? item.run_3 ?? NaN);
 
-reloadFromFileBtn.addEventListener("click", async () => {
-  const file = fileInput.files && fileInput.files[0];
-  if (!file) { statusValue.textContent = "Выберите файл json"; return; }
-  try { await loadTeamsFromFile(file); } catch { statusValue.textContent = "Ошибка JSON формата"; }
-});
+          if (!name || (!Number.isFinite(run1) && !Number.isFinite(run2) && !Number.isFinite(run3))) continue;
 
-searchInput.addEventListener("input", (e) => { searchQuery = e.target.value || ""; renderTable(); });
+          const bestScore = Math.max(
+            Number.isFinite(run1) ? run1 : -Infinity,
+            Number.isFinite(run2) ? run2 : -Infinity,
+            Number.isFinite(run3) ? run3 : -Infinity
+          );
 
-renderTable();
-startPolling();
-</script>
+          normalized.push({ name, room, run1, run2, run3, bestScore });
+        }
+
+        return normalized;
+      }
+
+      function getSortedTeams(filteredTeams) {
+        const list = filteredTeams.slice();
+        list.sort((a,b) => {
+          if(b.bestScore!==a.bestScore) return b.bestScore - a.bestScore;
+          return a.name.localeCompare(b.name,"ru");
+        });
+        return list;
+      }
+
+      function renderTable() {
+        const q = searchQuery.trim().toLowerCase();
+        const filtered = !q ? teams : teams.filter(t => t.name.toLowerCase().includes(q));
+        const overallSorted = getSortedTeams(teams);
+        const rankByName = new Map();
+        overallSorted.forEach((t,i)=>rankByName.set(t.name,i+1));
+
+        const sorted = getSortedTeams(filtered);
+        countValueInner.textContent = String(sorted.length);
+        tableBody.innerHTML = "";
+
+        if(sorted.length===0){
+          const tr=document.createElement("tr");
+          tr.innerHTML=`<td colspan="6" style="text-align:center; color: rgba(237,237,237,0.65); padding: 18px 14px;">Ничего не найдено.</td>`;
+          tableBody.appendChild(tr);
+          return;
+        }
+
+        sorted.forEach(team=>{
+          const place = rankByName.get(team.name);
+          const rowClass = place===1?"top1":place===2?"top2":place===3?"top3":"";
+          const tr=document.createElement("tr");
+          tr.className=rowClass;
+          tr.innerHTML=`
+            <td>${place}</td>
+            <td>${escapeHtml(team.name)}</td>
+            <td>${formatRun(team.run1)}</td>
+            <td>${formatRun(team.run2)}</td>
+            <td>${formatRun(team.run3)}</td>
+            <td>${escapeHtml(team.room)}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+
+        tableBody.classList.remove("fadeIn");
+        void tableBody.offsetWidth;
+        tableBody.classList.add("fadeIn");
+      }
+
+      async function tryLoadTeamsFromFetch(){
+        const cacheBustedUrl="./teams.json?t="+Date.now();
+        const response = await fetch(cacheBustedUrl,{cache:"no-store"});
+        if(!response.ok) throw new Error("HTTP "+response.status);
+        const text = await response.text();
+        const nextHash = hashText(text);
+        if(nextHash===lastTeamsTextHash) return;
+        const parsed = JSON.parse(text);
+        teams=normalizeTeams(parsed);
+        lastTeamsTextHash=nextHash;
+        statusValue.textContent="Обновлено";
+        updatedValue.textContent=new Date().toLocaleString();
+        renderTable();
+      }
+
+      function startPolling(){
+        (async ()=>{
+          try{
+            await tryLoadTeamsFromFetch();
+            statusValue.textContent="Готово";
+          }catch{
+            statusValue.textContent="Не могу загрузить json";
+            fallback.classList.add("visible");
+          }
+        })();
+        setInterval(async()=>{ try{ await tryLoadTeamsFromFetch(); fallback.classList.remove("visible"); }catch{} },5000);
+      }
+
+      async function loadTeamsFromFile(file){
+        const text=await file.text();
+        const parsed=JSON.parse(text);
+        teams=normalizeTeams(parsed);
+        lastTeamsTextHash=hashText(text);
+        statusValue.textContent="Загружено вручную";
+        updatedValue.textContent=new Date().toLocaleString();
+        renderTable();
+      }
+
+      reloadFromFileBtn.addEventListener("click",async()=>{
+        const file=fileInput.files && fileInput.files[0];
+        if(!file){statusValue.textContent="Выберите файл json";return;}
+        try{await loadTeamsFromFile(file);}catch{statusValue.textContent="Ошибка JSON формата";}
+      });
+
+      searchInput.addEventListener("input",(e)=>{
+        searchQuery=e.target.value||"";
+        renderTable();
+      });
+
+      renderTable();
+      startPolling();
+    </script>
+  </body>
+</html>

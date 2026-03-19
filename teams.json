@@ -14,7 +14,21 @@
     "room": "302"
   },
   {
-    "name": "Команда В",
+    "name": "CTRL-Rex",
+    "run1": 410,
+    "run2": 420,
+    "run3": 405,
+    "room": "303"
+  },
+  {
+    "name": "Astro-Rise",
+    "run1": 410,
+    "run2": 420,
+    "run3": 405,
+    "room": "303"
+  },
+  {
+    "name": "Spirix",
     "run1": 410,
     "run2": 420,
     "run3": 405,

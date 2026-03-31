@@ -1,37 +1,32 @@
 [
-  {
-    "name": "Obalduyes",
-    "run1": 485,
-    "run2": 490,
-    "run3": 478,
-    "room": "301"
-  },
-  {
-    "name": "Kundelik",
-    "run1": 450,
-    "run2": 455,
-    "run3": 442,
-    "room": "302"
-  },
-  {
-    "name": "CTRL-Rex",
-    "run1": 410,
-    "run2": 420,
-    "run3": 405,
-    "room": "303"
-  },
-  {
-    "name": "Astro-Rise",
-    "run1": 410,
-    "run2": 420,
-    "run3": 405,
-    "room": "303"
-  },
-  {
-    "name": "Spirix",
-    "run1": 410,
-    "run2": 420,
-    "run3": 405,
-    "room": "303"
-  }
+  { "name": "CtrlRex", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Spectral", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "i-Stars", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "SlapSeals", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Sparks", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Heptory", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Riviera Robotics", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Nimbus", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "GlitchTech", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Snapmakers", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "RSSaran Girls", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Moving Eleven", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Robotics Alikhan 15", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Error 404", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Obalduyes", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Fizmat Robotics", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Fizmat Tech", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Society by NSPM", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "AstroRise", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "SpiriX", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Kuromi", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Farabi Robotics", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Sunkar-Q", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Skybound", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Kaskabulak", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Imperium", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "SilkWayBots", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Nova", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Ontustik", "run1": "--", "run2": "--", "run3": "--", "room": "--" },
+  { "name": "Beasts", "run1": "--", "run2": "--", "run3": "--", "room": "--" }
 ]

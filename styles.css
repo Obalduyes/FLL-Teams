@@ -1,576 +1,367 @@
-/* -----------------------------
-   Dark monochrome design system
-   ----------------------------- */
-:root {
-  --bg: #000000;
-  --card: rgba(255, 255, 255, 0.025);
-  --card-2: rgba(255, 255, 255, 0.02);
-  --text: #ffffff;
-  --muted: rgba(255, 255, 255, 0.55);
-  --border: rgba(255, 255, 255, 0.14);
-  --border-2: rgba(255, 255, 255, 0.22);
-  --hover: rgba(255, 255, 255, 0.06);
-  --focus: rgba(255, 255, 255, 0.35);
-}
-
-/* Page reset for consistent rendering */
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  min-height: 100%;
-  position: relative;
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: "IBM Plex Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: url("bg-code.png") center center / min(34vmin, 220px) no-repeat fixed;
-  filter: brightness(0.22) opacity(0.55);
-  -webkit-filter: brightness(0.22) opacity(0.55);
-}
-
-.sideRail {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  z-index: 0;
-  width: min(36vw, 460px);
-  display: flex;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.sideRail--left {
-  left: 0;
-  padding-left: max(0px, env(safe-area-inset-left));
-  justify-content: flex-start;
-}
-
-.sideRail--right {
-  right: 0;
-  padding-right: max(0px, env(safe-area-inset-right));
-  justify-content: flex-end;
-}
-
-.sideRail__inner {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.sideRail--left .sideRail__inner {
-  padding-left: 4px;
-}
-
-.sideRail--right .sideRail__inner {
-  padding-right: 4px;
-}
-
-.sideRail__inner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.sideRail--left .sideRail__inner::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.2) 35%,
-    #000000 88%,
-    #000000 100%
-  );
-}
-
-.sideRail--right .sideRail__inner::after {
-  background: linear-gradient(
-    270deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.2) 35%,
-    #000000 88%,
-    #000000 100%
-  );
-}
-
-.sideRail__pre {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  height: 100%;
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: clamp(10px, 1.65vw, 13px);
-  line-height: 1.18;
-  letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.38);
-  text-shadow: 0 0 12px rgba(160, 200, 255, 0.35);
-  white-space: pre;
-  overflow: hidden;
-  text-align: left;
-}
-
-.sideRail--right .sideRail__pre {
-  text-align: right;
-}
-
-.sideRail--left .sideRail__pre {
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 22%,
-    rgba(0, 0, 0, 0.2) 62%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 22%,
-    rgba(0, 0, 0, 0.2) 62%,
-    rgba(0, 0, 0, 0) 100%
-  );
-}
-
-.sideRail--right .sideRail__pre {
-  -webkit-mask-image: linear-gradient(
-    270deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 22%,
-    rgba(0, 0, 0, 0.2) 62%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  mask-image: linear-gradient(
-    270deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 22%,
-    rgba(0, 0, 0, 0.2) 62%,
-    rgba(0, 0, 0, 0) 100%
-  );
-}
-
-@media (max-width: 720px) {
-  .sideRail {
-    width: min(42vw, 200px);
-    opacity: 0.85;
-  }
-
-  .sideRail__pre {
-    font-size: clamp(8px, 2.4vw, 11px);
-  }
-}
-
-/* Center column — чистая «дорожка» как на макете */
-.page {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 48px 20px 56px;
-}
-
-.hero {
-  text-align: center;
-  margin-bottom: 36px;
-}
-
-.hero__eyebrow {
-  margin: 0 0 12px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
-  font-variant-numeric: tabular-nums;
-}
-
-.hero__title {
-  margin: 0 0 20px;
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  /* Узкий экран: кегль ужимается, чтобы строка помещалась без горизонтальной прокрутки */
-  font-size: clamp(10px, calc(0.38rem + 2.25vw), 2.35rem);
-  font-weight: 700;
-  font-style: italic;
-  letter-spacing: 0.06em;
-  line-height: 1.2;
-  text-transform: none;
-  display: inline-block;
-  max-width: 100%;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  text-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.9),
-    0 0 20px rgba(255, 255, 255, 0.1);
-}
-
-.hero__lead {
-  margin: 0 0 22px;
-  font-size: 1rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.92);
-}
-
-.searchShell {
-  position: relative;
-  width: 100%;
-  max-width: 520px;
-  margin: 0 auto;
-}
-
-.searchShell__icon {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.45);
-  display: flex;
-  pointer-events: none;
-}
-
-.searchShell__input {
-  width: 100%;
-  margin: 0;
-  padding: 16px 18px 16px 48px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.035);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: var(--text);
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.searchShell__input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.searchShell__input:hover {
-  background: rgba(255, 255, 255, 0.055);
-}
-
-.searchShell__input:focus {
-  border-color: var(--focus);
-  background: rgba(255, 255, 255, 0.065);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
-}
-
-.hero__meta {
-  margin: 18px auto 0;
-  max-width: 520px;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--muted);
-}
-
-.hero__status {
-  margin: 14px 0 0;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.hero__statusSep {
-  margin: 0 6px;
-}
-
-.input {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 11px 12px;
-  color: var(--text);
-  outline: none;
-  transition: border-color 140ms ease, background 140ms ease;
-}
-
-/* Make <select> elements consistently dark (system styles can be light by default). */
-select.input {
-  color-scheme: dark;
-  background: rgba(0, 0, 0, 0.35);
-  padding-right: 10px;
-}
-
-select.input:focus {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-select.input option {
-  background: #000000;
-  color: var(--text);
-}
-
-.input:focus {
-  border-color: var(--focus);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.status {
-  background: var(--card-2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 12px;
-}
-
-.status .row {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.status .label {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.status .value {
-  font-size: 12px;
-  color: rgba(237, 237, 237, 0.86);
-}
-
-/* Main card holding the table */
-.card {
-  margin-top: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-/* Responsive table wrapper */
-.tableWrap {
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-thead th {
-  position: sticky;
-  top: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-  color: rgba(237, 237, 237, 0.65);
-  font-weight: 600;
-  text-align: left;
-  padding: 8px 6px;
-  white-space: nowrap;
-  letter-spacing: -0.01em;
-}
-
-tbody td {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 8px 6px;
-  font-size: 13px;
-  color: rgba(237, 237, 237, 0.92);
-  vertical-align: top;
-}
-
-tbody tr {
-  transition: background-color 140ms ease, transform 140ms ease;
-}
-
-tbody tr:not(.tableSectionSep):hover {
-  background: var(--hover);
-}
-
-tbody tr.tableSectionSep td {
-  padding: 7px 6px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--muted);
-  text-align: center;
-  background: rgba(0, 0, 0, 0.4);
-  border-top: 1px solid var(--border-2);
-  border-bottom: 1px solid var(--border);
-}
-
-tbody tr.rowNoResult td {
-  color: rgba(237, 237, 237, 0.55);
-}
-
-tbody tr.rowNoResult td:first-child {
-  color: rgba(237, 237, 237, 0.4);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Top-3 visual emphasis */
-tbody tr.top1 {
-  background: rgba(255, 255, 255, 0.10);
-  border-bottom-color: rgba(255, 255, 255, 0.18);
-}
-
-tbody tr.top2 {
-  background: rgba(255, 255, 255, 0.07);
-  border-bottom-color: rgba(255, 255, 255, 0.16);
-}
-
-tbody tr.top3 {
-  background: rgba(255, 255, 255, 0.05);
-  border-bottom-color: rgba(255, 255, 255, 0.14);
-}
-
-tbody tr.top1 td,
-tbody tr.top2 td,
-tbody tr.top3 td {
-  font-weight: 700;
-}
-
-/* Small helper */
-.muted {
-  color: var(--muted);
-}
-
-/* File picker fallback (used if fetch is blocked by browser security) */
-.fallback {
-  display: none;
-  margin-top: 14px;
-  padding: 12px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-}
-
-.fallback.visible {
-  display: block;
-}
-
-.fallback .hint {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.35;
-  margin: 0 0 10px 0;
-}
-
-/* Simple fade-in animation for table updates */
-.fadeIn {
-  animation: fadeIn 180ms ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0.4;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Tutorial UI */
-.tutorialBtn {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 140ms ease, transform 140ms ease;
-}
-
-.tutorialBtn:hover {
-  background: rgba(255, 255, 255, 0.10);
-  transform: translateY(-1px);
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  z-index: 50;
-  padding: 18px;
-}
-
-.modal.visible {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modalInner {
-  width: min(760px, 100%);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 16px 18px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-}
-
-.modalHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.modalTitle {
-  margin: 0;
-  font-size: 16px;
-  letter-spacing: 0.2px;
-}
-
-.modalCloseBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--text);
-  cursor: pointer;
-  font-size: 20px;
-  line-height: 1;
-  transition: background-color 140ms ease;
-}
-
-.modalCloseBtn:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.modalBody {
-  margin-top: 10px;
-  color: var(--text);
-}
-
-.tutorialList {
-  margin: 0;
-  padding-left: 18px;
-  color: rgba(237, 237, 237, 0.92);
-}
+<!doctype html>
+<html lang="ru">
+  <head>
+    <!-- Иконка сайта в браузере -->
+    <link rel="icon" href="mid.ico" type="image/x-icon" />
+    <!-- Кодировка -->
+    <meta charset="utf-8" />
+    <!-- Адаптивность на мобильных -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Заголовок вкладки -->
+    <title>FLL Bilim Shini Offseason</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="sideRail sideRail--left" aria-hidden="true">
+      <div class="sideRail__inner">
+        <pre class="sideRail__pre"></pre>
+      </div>
+    </div>
+    <div class="sideRail sideRail--right" aria-hidden="true">
+      <div class="sideRail__inner">
+        <pre class="sideRail__pre"></pre>
+      </div>
+    </div>
+    <div class="page">
+      <header class="hero">
+        <p class="hero__eyebrow">FIRST LEGO LEAGUE</p>
+        <h1 class="hero__title">FLL Bilim Shini Offseason</h1>
+        <p class="hero__lead">Введите номер команды или название</p>
+        <div class="searchShell">
+          <span class="searchShell__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M21 21l-4.3-4.3" />
+            </svg>
+          </span>
+          <input
+            id="searchInput"
+            class="searchShell__input"
+            type="search"
+            placeholder="Например: 12345 или Obalduyes"
+            autocomplete="off"
+            enterkeyhint="search"
+          />
+        </div>
+        <p class="hero__meta" id="dbHint">В базе 0 команд. Начните вводить номер или название.</p>
+        <p class="hero__status" aria-live="polite">
+          <span id="statusValue">Загрузка…</span>
+          <span class="hero__statusSep" aria-hidden="true">·</span>
+          <span id="updatedValue">—</span>
+        </p>
+      </header>
+
+      <!-- Fallback, если JSON не загрузился автоматически -->
+      <div id="fallback" class="fallback">
+        <p class="hint">
+          Не удалось загрузить <code>.json</code> автоматически. Выберите файл вручную.
+        </p>
+        <input id="fileInput" type="file" accept="application/json" />
+        <button id="reloadFromFileBtn" type="button" class="input" style="margin-top: 10px; padding: 10px 12px; cursor: pointer;">
+          Загружать выбранный JSON
+        </button>
+      </div>
+
+      <!-- Таблица с результатами команд -->
+      <div class="card">
+        <div class="tableWrap">
+          <table id="resultsTable" aria-label="Таблица результатов и мест команд FLL">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody">
+              <!-- Ряды таблицы добавляются скриптом -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      (function fillSideRails() {
+        const chunk = "10101010101 ";
+        const line = (chunk.repeat(14) + chunk).trim();
+        const block = Array.from({ length: 120 }, () => line).join("\n");
+        document.querySelectorAll(".sideRail__pre").forEach((el) => {
+          el.textContent = block;
+        });
+      })();
+
+      // Получаем элементы страницы
+      const statusValue = document.getElementById("statusValue");
+      const updatedValue = document.getElementById("updatedValue");
+      const searchInput = document.getElementById("searchInput");
+      const tableBody = document.getElementById("tableBody");
+      const tableHead = document.getElementById("tableHead");
+      const dbHint = document.getElementById("dbHint");
+
+      const fallback = document.getElementById("fallback");
+      const fileInput = document.getElementById("fileInput");
+      const reloadFromFileBtn = document.getElementById("reloadFromFileBtn");
+
+      let teams = []; // массив команд
+      let lastTeamsTextHash = ""; // хэш последнего загруженного JSON
+      let searchQuery = ""; // текст поиска
+
+      // Забег: число — результат; DNF, NS, пусто — нет результата
+      function parseRunRaw(v) {
+        if (v === undefined || v === null) return NaN;
+        if (typeof v === "string") {
+          const t = v.trim();
+          if (!t) return NaN;
+          const u = t.toUpperCase();
+          if (
+            u === "DNF" ||
+            u === "DNS" ||
+            u === "NS" ||
+            u === "DQ" ||
+            u === "—" ||
+            u === "-" ||
+            u === "N/A"
+          ) {
+            return NaN;
+          }
+        }
+        const n = Number(v);
+        return Number.isFinite(n) ? n : NaN;
+      }
+
+      // Форматирование результатов
+      function formatRun(value) {
+        return Number.isFinite(Number(value)) ? `${value}` : "—";
+      }
+
+      // Хэш текста JSON для проверки изменений
+      function hashText(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return (h >>> 0).toString(16);
+      }
+
+      // Экранирование HTML для безопасности
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      // Преобразуем JSON в массив команд
+      function normalizeTeams(jsonData) {
+        if (!Array.isArray(jsonData)) return [];
+        const normalized = [];
+
+        for (const item of jsonData) {
+          if (!item || typeof item !== "object") continue;
+          const name = String(item.name ?? "").trim();
+          const numRaw = item.number ?? item.teamNumber ?? item.team ?? item["team number"];
+          const number =
+            numRaw === undefined || numRaw === null || String(numRaw).trim() === ""
+              ? "--"
+              : String(numRaw).trim();
+
+          const run1 = parseRunRaw(item.run1 ?? item["1st run"] ?? item.firstRun ?? item.run_1 ?? item.score1 ?? item.score);
+          const run2 = parseRunRaw(item.run2 ?? item["2nd run"] ?? item.secondRun ?? item.run_2);
+          const run3 = parseRunRaw(item.run3 ?? item["3rd run"] ?? item.thirdRun ?? item.run_3);
+
+          if (!name) continue;
+
+          const finiteRuns = [run1, run2, run3].filter(Number.isFinite);
+          const hasScore = finiteRuns.length > 0;
+          const bestScore = hasScore ? Math.max(...finiteRuns) : null;
+
+          normalized.push({
+            name,
+            number,
+            run1,
+            run2,
+            run3,
+            bestScore,
+            hasScore,
+          });
+        }
+
+        return normalized;
+      }
+
+      // Сортировка: сначала с зачётным результатом (по лучшему забегу), затем без — по алфавиту
+      function getSortedTeams(filteredTeams) {
+        const list = filteredTeams.slice();
+        list.sort((a, b) => {
+          if (a.hasScore !== b.hasScore) return a.hasScore ? -1 : 1;
+          if (a.hasScore && b.hasScore && b.bestScore !== a.bestScore) {
+            return b.bestScore - a.bestScore;
+          }
+          return a.name.localeCompare(b.name, "ru");
+        });
+        return list;
+      }
+
+      function buildRankByName(allTeams) {
+        const ranked = getSortedTeams(allTeams).filter((t) => t.hasScore);
+        const map = new Map();
+        ranked.forEach((t, i) => map.set(t.name, i + 1));
+        return map;
+      }
+
+      function updateDbHint(filteredLen) {
+        const q = searchQuery.trim();
+        const total = teams.length;
+        if (!q) {
+          dbHint.textContent =
+            total === 0
+              ? "Загрузка списка команд…"
+              : `В базе ${total} команд. Начните вводить номер или название.`;
+        } else {
+          dbHint.textContent = `Найдено: ${filteredLen} из ${total}.`;
+        }
+      }
+
+      // Отрисовка таблицы
+      function renderTable() {
+        const q = searchQuery.trim().toLowerCase();
+        const filtered = !q
+          ? teams
+          : teams.filter((t) => {
+              const nameMatch = t.name.toLowerCase().includes(q);
+              const numMatch = String(t.number).toLowerCase().includes(q);
+              return nameMatch || numMatch;
+            });
+        const sorted = getSortedTeams(filtered);
+        updateDbHint(sorted.length);
+        tableBody.innerHTML = "";
+
+        tableHead.innerHTML = `
+            <tr>
+              <th style="width: 90px;">Место</th>
+              <th style="width: 100px;">№ команды</th>
+              <th style="min-width: 180px;">Название команды</th>
+              <th style="width: 120px;">1st run</th>
+              <th style="width: 120px;">2nd run</th>
+              <th style="width: 120px;">3rd run</th>
+            </tr>`;
+
+        const rankByName = buildRankByName(teams);
+        const showNoResultSep =
+          sorted.some((t) => t.hasScore) && sorted.some((t) => !t.hasScore);
+        const firstNoScoreIdx = showNoResultSep ? sorted.findIndex((t) => !t.hasScore) : -1;
+
+        if (sorted.length === 0) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td colspan="6" style="text-align:center;">Ничего не найдено.</td>`;
+          tableBody.appendChild(tr);
+          return;
+        }
+
+        sorted.forEach((team, idx) => {
+          if (idx === firstNoScoreIdx) {
+            const sep = document.createElement("tr");
+            sep.className = "tableSectionSep";
+            sep.innerHTML =
+              '<td colspan="6">Без результата (DNF, неявка и т.д.)</td>';
+            tableBody.appendChild(sep);
+          }
+
+          const place = team.hasScore ? rankByName.get(team.name) : null;
+          let rowClass = "";
+          if (team.hasScore) {
+            rowClass =
+              place === 1 ? "top1" : place === 2 ? "top2" : place === 3 ? "top3" : "";
+          } else {
+            rowClass = "rowNoResult";
+          }
+
+          const tr = document.createElement("tr");
+          tr.className = rowClass;
+          tr.innerHTML = `
+            <td>${place != null ? place : "—"}</td>
+            <td>${escapeHtml(team.number)}</td>
+            <td>${escapeHtml(team.name)}</td>
+            <td>${formatRun(team.run1)}</td>
+            <td>${formatRun(team.run2)}</td>
+            <td>${formatRun(team.run3)}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      }
+
+      // Загрузка JSON через fetch
+      async function tryLoadTeamsFromFetch(){
+        const cacheBustedUrl="./teams.json?t="+Date.now();
+        const response = await fetch(cacheBustedUrl,{cache:"no-store"});
+        if(!response.ok) throw new Error("HTTP "+response.status);
+        const text = await response.text();
+        const nextHash = hashText(text);
+        if(nextHash===lastTeamsTextHash) return;
+        const parsed = JSON.parse(text);
+        teams=normalizeTeams(parsed);
+        lastTeamsTextHash=nextHash;
+        statusValue.textContent="Обновлено";
+        updatedValue.textContent = new Date().toLocaleString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        renderTable();
+      }
+
+      // Запуск периодической проверки обновлений
+      function startPolling(){
+        (async ()=>{
+          try{
+            await tryLoadTeamsFromFetch();
+            statusValue.textContent="Готово";
+          }catch{
+            statusValue.textContent="Не могу загрузить json";
+            fallback.classList.add("visible");
+          }
+        })();
+        setInterval(async()=>{ try{ await tryLoadTeamsFromFetch(); fallback.classList.remove("visible"); }catch{} },5000);
+      }
+
+      // Загрузка JSON вручную через input
+      async function loadTeamsFromFile(file){
+        const text=await file.text();
+        const parsed=JSON.parse(text);
+        teams=normalizeTeams(parsed);
+        lastTeamsTextHash=hashText(text);
+        statusValue.textContent="Загружено вручную";
+        updatedValue.textContent = new Date().toLocaleString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        renderTable();
+      }
+
+      // Обработчик кнопки загрузки JSON вручную
+      reloadFromFileBtn.addEventListener("click",async()=>{
+        const file=fileInput.files && fileInput.files[0];
+        if(!file){statusValue.textContent="Выберите файл json";return;}
+        try{await loadTeamsFromFile(file);}catch{statusValue.textContent="Ошибка JSON формата";}
+      });
+
+      // Обработчик поиска в реальном времени
+      searchInput.addEventListener("input",(e)=>{
+        searchQuery=e.target.value||"";
+        renderTable();
+      });
+
+      // Первоначальный рендер и запуск опроса
+      renderTable();
+      startPolling();
+    </script>
+  </body>
+</html>

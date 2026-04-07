@@ -81,38 +81,56 @@ body.light-theme .hero__title--fll {
   text-shadow: 
     0 1px 0 rgba(255, 255, 255, 0.9),
     0 0 20px rgba(0, 0, 0, 0.1);
-  font-family: "SF Pro", ui-serif, serif;
+  font-family: "SF Pro Display", ui-serif, serif;
   font-weight: 700;
   font-style: italic;
 }
 
 body.light-theme .hero__title--main {
-  color: #00a8ff;
+  color: rgba(0, 168, 255, 0.9);
   text-shadow: 
-    0 0 10px rgba(0, 168, 255, 0.8),
-    0 0 20px rgba(0, 168, 255, 0.6),
-    0 0 30px rgba(0, 168, 255, 0.4),
+    0 0 8px rgba(0, 168, 255, 0.4),
+    0 0 15px rgba(0, 168, 255, 0.3),
+    0 0 25px rgba(0, 168, 255, 0.2),
     0 1px 0 rgba(255, 255, 255, 0.9);
-  font-family: "SF Pro", ui-serif, serif;
+  font-family: "SF Pro Display", ui-serif, serif;
   font-weight: 700;
   font-style: italic;
 }
 
-/* Apply SF Bold Italic to title in dark theme too */
+/* Apply Helvetica Neue Bold Italic to title in dark theme too */
 .hero__title {
-  font-family: "SF Pro", ui-serif, serif;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   font-weight: 700;
   font-style: italic;
 }
 
 .hero__title--fll {
-  font-family: "SF Pro", ui-serif, serif;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   font-weight: 700;
   font-style: italic;
 }
 
 .hero__title--main {
-  font-family: "SF Pro", ui-serif, serif;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  color: #ffffff;
+  text-shadow: 
+    0 0 15px rgba(255, 255, 255, 0.8),
+    0 0 25px rgba(255, 255, 255, 0.6),
+    0 0 35px rgba(255, 255, 255, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+body.light-theme .hero__title--main {
+  color: rgba(0, 168, 255, 0.9);
+  text-shadow: 
+    0 0 8px rgba(0, 168, 255, 0.4),
+    0 0 15px rgba(0, 168, 255, 0.3),
+    0 0 25px rgba(0, 168, 255, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   font-weight: 700;
   font-style: italic;
 }
@@ -390,13 +408,47 @@ body.light-theme .sideRail--right .sideRail__inner::after {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.75);
   font-variant-numeric: tabular-nums;
+  animation: flicker 1.5s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  20% {
+    opacity: 0.3;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  40% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.4;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.1;
+  }
+  90% {
+    opacity: 0.6;
+  }
 }
 
 .hero__title {
   margin: 0 0 20px;
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  /* Узкий экран: кегль ужимается, чтобы строка помещалась без горизонтальной прокрутки */
-  font-size: clamp(10px, calc(0.38rem + 2.25vw), 2.35rem);
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  /* Larger font size for better visibility */
+  font-size: clamp(12px, calc(0.45rem + 2.8vw), 2.8rem);
   font-weight: 700;
   font-style: italic;
   letter-spacing: 0.06em;
@@ -409,6 +461,20 @@ body.light-theme .sideRail--right .sideRail__inner::after {
   text-shadow:
     0 1px 0 rgba(0, 0, 0, 0.9),
     0 0 20px rgba(255, 255, 255, 0.1);
+  position: relative;
+  left: 0;
+  top: 0;
+  transform: translateX(0);
+  animation: rocking 4s ease-in-out infinite;
+}
+
+@keyframes rocking {
+  0%, 100% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
 }
 
 .hero__lead {

@@ -8,7 +8,7 @@
   { "name": "Riviera Robotics", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "Nimbus", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "GlitchTech", "number": "--", "run1": null, "run2": null, "run3": null },
-  { "name": "Snapmakers", "number": "--", "run1": null, "run2": null, "run3": null },
+  { "name": "Snapmakers", "number": "#333333", "run1": null, "run2": null, "run3": null },
   { "name": "RSSaran Girls", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "Moving Eleven", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "Robotics Alikhan 15", "number": "--", "run1": null, "run2": null, "run3": null },

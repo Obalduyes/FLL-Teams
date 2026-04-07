@@ -1,6 +1,6 @@
 [
   { "name": "CtrlRex", "number": "--", "run1": null, "run2": null, "run3": null },
-  { "name": "Spectral", "number": "--", "run1": null, "run2": null, "run3": null },
+  { "name": "Spectral", "number": "#311011", "run1": null, "run2": null, "run3": null },
   { "name": "i-Stars", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "SlapSeals", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "Sparks", "number": "--", "run1": null, "run2": null, "run3": null },
@@ -30,7 +30,7 @@
   { "name": "Ontustik", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "Beasts", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "Amor", "number": "--", "run1": null, "run2": null, "run3": null },
-  { "name": "Tanyl Tech", "number": "--", "run1": null, "run2": null, "run3": null },
+  { "name": "Tanyl Tech", "number": "#311626", "run1": null, "run2": null, "run3": null },
   { "name": "Burros", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "Ender Force", "number": "--", "run1": null, "run2": null, "run3": null },
   { "name": "SBIL-LION-AIRES", "number": "--", "run1": null, "run2": null, "run3": null },

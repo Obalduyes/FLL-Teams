@@ -71,22 +71,50 @@ body.light-theme .hero__title {
   text-shadow: 
     0 1px 0 rgba(255, 255, 255, 0.9),
     0 0 20px rgba(0, 0, 0, 0.1);
+  font-family: "SF Pro", ui-serif, serif;
+  font-weight: 700;
+  font-style: italic;
 }
 
-body.light-theme .hero__title--bilim {
+body.light-theme .hero__title--fll {
   color: #000000;
   text-shadow: 
     0 1px 0 rgba(255, 255, 255, 0.9),
     0 0 20px rgba(0, 0, 0, 0.1);
+  font-family: "SF Pro", ui-serif, serif;
+  font-weight: 700;
+  font-style: italic;
 }
 
-body.light-theme .hero__title--offseason {
+body.light-theme .hero__title--main {
   color: #00a8ff;
   text-shadow: 
     0 0 10px rgba(0, 168, 255, 0.8),
     0 0 20px rgba(0, 168, 255, 0.6),
     0 0 30px rgba(0, 168, 255, 0.4),
     0 1px 0 rgba(255, 255, 255, 0.9);
+  font-family: "SF Pro", ui-serif, serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* Apply SF Bold Italic to title in dark theme too */
+.hero__title {
+  font-family: "SF Pro", ui-serif, serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.hero__title--fll {
+  font-family: "SF Pro", ui-serif, serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.hero__title--main {
+  font-family: "SF Pro", ui-serif, serif;
+  font-weight: 700;
+  font-style: italic;
 }
 
 body.light-theme .hero__eyebrow {

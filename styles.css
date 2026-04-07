@@ -408,7 +408,6 @@ body.light-theme .sideRail--right .sideRail__inner::after {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.75);
   font-variant-numeric: tabular-nums;
-  animation: flicker 1.5s ease-in-out infinite;
 }
 
 @keyframes flicker {

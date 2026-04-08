@@ -8,7 +8,7 @@
     <!-- Адаптивность на мобильных -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Заголовок вкладки -->
-    <title>FLL Bilim Shini Offseason</title>
+    <title>FLL Bilim Shyny Off-Season</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,7 +16,7 @@
       rel="stylesheet"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@700;1,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=SF+Pro:wght@700;1,700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
@@ -35,7 +35,7 @@
     <div class="page">
       <header class="hero">
         <p class="hero__eyebrow">FIRST LEGO LEAGUE</p>
-        <h1 class="hero__title"><span class="hero__title--fll">FLL</span> <span class="hero__title--main">Bilim Shyny Offseason</span></h1>
+        <h1 class="hero__title"><span class="hero__title--fll">FLL</span> <span class="hero__title--main">Bilim Shyny Off-Season</span></h1>
         <p class="hero__lead">Введите номер команды или название</p>
         <div class="searchShell">
           <span class="searchShell__icon" aria-hidden="true">
@@ -539,13 +539,13 @@
 
         let message = '';
         if (percentage >= 90) {
-          message = 'Покажите свой результат на питзоне команды Obalduyes, что бы получить приз!';
+          message = 'Отлично! Вы настоящий эксперт FLL! 🏆';
         } else if (percentage >= 70) {
-          message = 'Покажите свой результат на питзоне команды Obalduyes, что бы получить приз!';
+          message = 'Хорошо! Вы хорошо знаете FLL! 🌟';
         } else if (percentage >= 50) {
-          message = 'Покажите свой результат на питзоне команды Obalduyes, что бы получить приз!';
+          message = 'Неплохо! Но есть куда расти! 📈';
         } else {
-          message = 'Покажите свой результат на питзоне команды Obalduyes, что бы получить приз!';
+          message = 'Продолжайте изучать FLL! 💪';
         }
 
         scoreText.textContent = `Вы правильно ответили на ${quizScore} из ${quizQuestions.length} вопросов. ${message}`;

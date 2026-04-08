@@ -537,16 +537,7 @@
 
         scorePercentage.textContent = `${percentage}%`;
 
-        let message = '';
-        if (percentage >= 90) {
-          message = 'Отлично! Вы настоящий эксперт FLL! 🏆';
-        } else if (percentage >= 70) {
-          message = 'Хорошо! Вы хорошо знаете FLL! 🌟';
-        } else if (percentage >= 50) {
-          message = 'Неплохо! Но есть куда расти! 📈';
-        } else {
-          message = 'Продолжайте изучать FLL! 💪';
-        }
+        let message = 'WWW';
 
         scoreText.textContent = `Вы правильно ответили на ${quizScore} из ${quizQuestions.length} вопросов. ${message}`;
       }
